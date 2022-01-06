@@ -1,3 +1,6 @@
+using System.Security.Cryptography;
+using System.Text;
+
 public class BackupSpec {
     public string Path { get; }
     public IEnumerable<BackedUpFile> BackedUpElements => _backedUpElements.Values;
@@ -46,5 +49,10 @@ public class BackupSpec {
             _backedUpElements[newFile.Path] = newFile;
         foreach(var oldFile in readyBackupDetails.RemovableElements)
             _backedUpElements.Remove(oldFile);
+    }
+
+    public string GenerateUniqueID() {
+        using var md5 = MD5.Create();
+        return md5.ComputeHash(Encoding.UTF8.GetBytes(Path)).ToHexString();
     }
 }
