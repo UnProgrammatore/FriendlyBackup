@@ -1,11 +1,9 @@
-using log4net;
 using Newtonsoft.Json;
-
 public class FileBackupRepository : IBackupRepository
 {
     private readonly string _repoPath;
-    private readonly ILog _logger;
-    public FileBackupRepository(string repoPath, ILog logger)
+    private readonly ILogger _logger;
+    public FileBackupRepository(string repoPath, ILogger logger)
     {
         _repoPath = repoPath;
         _logger = logger;
@@ -19,7 +17,7 @@ public class FileBackupRepository : IBackupRepository
             if(obj != null)
                 yield return obj;
             else
-                _logger.Error($"Failed to deserialize BackupSpec {file}");
+                _logger.LogError($"Failed to deserialize BackupSpec {file}");
         }
     }
     public void SaveSpec(BackupSpec spec) 
