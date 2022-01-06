@@ -1,13 +1,13 @@
 public class BackupSpec {
     public string Path { get; }
-    public IEnumerable<IBackedUpElement> BackedUpElements => _backedUpElements.Values;
-    private readonly Dictionary<string, IBackedUpElement> _backedUpElements = new Dictionary<string, IBackedUpElement>();
+    public IEnumerable<BackedUpFile> BackedUpElements => _backedUpElements.Values;
+    private readonly Dictionary<string, BackedUpFile> _backedUpElements = new Dictionary<string, BackedUpFile>();
 
     public BackupSpec(string path) {
         Path = path;
     }
 
-    private static IEnumerable<IBackedUpElement> CalculateBackup(string path) {
+    private static IEnumerable<BackedUpFile> CalculateBackup(string path) {
         foreach(var file in Directory.GetFiles(path))
             yield return new BackedUpFile(file);
         foreach(var folder in Directory.GetDirectories(path))
@@ -15,7 +15,7 @@ public class BackupSpec {
                 yield return newFile;
     }
     public ReadyBackupDetails DiffBackup() {
-        var newBackedUpFiles = new Dictionary<string, IBackedUpElement>();
+        var newBackedUpFiles = new Dictionary<string, BackedUpFile>();
         var notFoundFiles = new HashSet<string>(_backedUpElements.Keys);
         var newFiles = new List<string>();
         foreach(var newElement in CalculateBackup(Path)) {

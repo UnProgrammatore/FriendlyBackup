@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 
-public class BackedUpFile : IBackedUpElement
+public class BackedUpFile
 {
     public string Path { get; }
 
