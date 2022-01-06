@@ -1,10 +1,16 @@
 public class BackupSpec {
     public string Path { get; }
     public IEnumerable<BackedUpFile> BackedUpElements => _backedUpElements.Values;
-    private readonly Dictionary<string, BackedUpFile> _backedUpElements = new Dictionary<string, BackedUpFile>();
+    private readonly Dictionary<string, BackedUpFile> _backedUpElements;
 
     public BackupSpec(string path) {
         Path = path;
+        _backedUpElements = new Dictionary<string, BackedUpFile>();
+    }
+
+    public BackupSpec(string path, IEnumerable<BackedUpFile> backedUpElements) {
+        Path = path;
+        _backedUpElements = backedUpElements.ToDictionary(x => x.Path);
     }
 
     private static IEnumerable<BackedUpFile> CalculateBackup(string path) {
@@ -17,11 +23,9 @@ public class BackupSpec {
     public ReadyBackupDetails DiffBackup() {
         var newBackedUpFiles = new Dictionary<string, BackedUpFile>();
         var notFoundFiles = new HashSet<string>(_backedUpElements.Keys);
-        var newFiles = new List<string>();
         foreach(var newElement in CalculateBackup(Path)) {
             if(!_backedUpElements.ContainsKey(newElement.Path))
             {
-                newFiles.Add(newElement.Path);
                 newBackedUpFiles.Add(newElement.Path, newElement);
             }
             else
@@ -29,12 +33,18 @@ public class BackupSpec {
                 notFoundFiles.Remove(newElement.Path);
                 if(!newElement.Hash.SequenceEqual(_backedUpElements[newElement.Path].Hash))
                 {
-                    newFiles.Add(newElement.Path);
                     newBackedUpFiles.Add(newElement.Path, newElement);
                 }
             }
         }
 
-        return new ReadyBackupDetails(newFiles, notFoundFiles);
+        return new ReadyBackupDetails(newBackedUpFiles.Values, notFoundFiles);
+    }
+
+    public void Apply(ReadyBackupDetails readyBackupDetails) {
+        foreach(var newFile in readyBackupDetails.ModifiedElements)
+            _backedUpElements[newFile.Path] = newFile;
+        foreach(var oldFile in readyBackupDetails.RemovableElements)
+            _backedUpElements.Remove(oldFile);
     }
 }
