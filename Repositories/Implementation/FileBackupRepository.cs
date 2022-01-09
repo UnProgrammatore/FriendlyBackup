@@ -1,11 +1,19 @@
+using FriendlyBackup.BackupManagement;
+using FriendlyBackup.Configuration;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+
+namespace FriendlyBackup.Repositories.Implementation;
+
 public class FileBackupRepository : IBackupRepository
 {
     private readonly string _repoPath;
-    private readonly ILogger _logger;
-    public FileBackupRepository(string repoPath, ILogger logger)
+    private readonly ILogger<FileBackupRepository> _logger;
+    public FileBackupRepository(IOptions<LocalPathsConfig> localPathsConfig, ILogger<FileBackupRepository> logger)
     {
-        _repoPath = repoPath;
+        _repoPath = localPathsConfig.Value.BackupRepositoryPath 
+            ?? throw new ArgumentNullException($"{nameof(localPathsConfig)}.{nameof(localPathsConfig.Value.BackupRepositoryPath)}");
+
         _logger = logger;
     }
     public IEnumerable<BackupSpec> GetAllSpecs()

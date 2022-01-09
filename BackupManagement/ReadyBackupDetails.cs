@@ -1,3 +1,5 @@
+namespace FriendlyBackup.BackupManagement;
+
 public class ReadyBackupDetails
 {
     public IEnumerable<BackedUpFile> ModifiedElements { get; }

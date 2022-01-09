@@ -1,4 +1,7 @@
 using System.Security.Cryptography;
+using Newtonsoft.Json;
+
+namespace FriendlyBackup.BackupManagement;
 
 public class BackedUpFile
 {
@@ -6,7 +9,8 @@ public class BackedUpFile
 
     public byte[] Hash { get; }
 
-    public BackedUpFile(string path, byte[] hash) 
+    [JsonConstructor]
+    public BackedUpFile(string path, byte[] hash)
     {
         Path = path;
         Hash = hash;
