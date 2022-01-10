@@ -1,3 +1,4 @@
+using FriendlyBackup.BackgroundWorkers;
 using FriendlyBackup.BackupManagement;
 using FriendlyBackup.BackupManagement.Testing;
 using FriendlyBackup.Configuration;
@@ -26,6 +27,9 @@ var configuration = configBuilder.Build();
 
 builder.Services.AddOptions();
 builder.Services.Configure<LocalPathsConfig>(configuration.GetSection("LocalPathsConfig"));
+
+builder.Services.AddSingleton<ILongRunningRequestsRunner, LongRunningTasksWorker>();
+builder.Services.AddSingleton<IHostedService>(serviceProvider => serviceProvider.GetRequiredService<ILongRunningRequestsRunner>());
 
 var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 
