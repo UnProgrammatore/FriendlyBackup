@@ -57,22 +57,46 @@ public class BackupSpecController : ControllerBase
         return Ok(diff);
     }
 
-    [HttpPost("{uniqueId}/alignment}")]
+    [HttpPost("{uniqueId}/alignment")]
     public ActionResult<string> PostAlignment([FromRoute] string uniqueId)
     {
         if(!_backupSpecs.SpecExists(uniqueId))
             return NotFound();
         var spec = _backupSpecs.GetSpec(uniqueId);
         var id = _longRunningRequestsRunner.RunLongRunningTask(cancellationToken => _backupConnector.PerformBackupAsync(spec, spec.GetDiffBackup()));
-        return Accepted(id);
+        return Ok(id);
+    }
+    [HttpGet("alignment/{taskId}")]
+    public ActionResult<bool> GetAlignment([FromRoute] string taskId)
+    {
+        if(!_longRunningRequestsRunner.ExistsTask(taskId))
+            return NotFound();
+        (var executed, _) = _longRunningRequestsRunner.GetTaskResult(taskId);
+        if(executed)
+            return Ok(executed);
+        else
+            return Accepted();
     }
 
-    [HttpGet("alignment/{id}")]
-    public ActionResult<bool> GetAlignment([FromRoute] string id)
+    [HttpPost("{uniqueId}/verification")]
+    public ActionResult<string> PostVerification([FromRoute] string uniqueId)
     {
-        if(!_longRunningRequestsRunner.ExistsTask(id))
+        if(!_backupSpecs.SpecExists(uniqueId))
             return NotFound();
-        (var executed, _) = _longRunningRequestsRunner.GetTaskResult(id);
-        return Ok(executed);
+        var spec = _backupSpecs.GetSpec(uniqueId);
+        var id = _longRunningRequestsRunner.RunLongRunningTask(cancellationToken => _backupConnector.CompareBackupAsync(spec));
+        return Ok(id);
+    }
+
+    [HttpGet("verification/{taskId}")]
+    public ActionResult<bool> GetVerification([FromRoute] string taskId)
+    {
+        if(!_longRunningRequestsRunner.ExistsTask(taskId))
+            return NotFound();
+        var (executed, result) = _longRunningRequestsRunner.GetTaskResult(taskId);
+        if(executed)
+            return Ok(result);
+        else
+            return Accepted();
     }
 }

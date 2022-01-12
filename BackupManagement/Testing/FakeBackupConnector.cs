@@ -15,11 +15,17 @@ public class FakeBackupConnector : IBackupConnector
         return Task.FromResult(true);
     }
 
-    public Task PerformBackupAsync(BackupSpec spec, ReadyBackupDetails details)
+    public Task FixBackupAsync(BackupSpec spec)
     {
+        
+        return Task.CompletedTask;
+    }
+
+    public async Task PerformBackupAsync(BackupSpec spec, ReadyBackupDetails details)
+    {
+        await Task.Delay(TimeSpan.FromSeconds(20));
         spec.Apply(details);
         _backupRepository.SaveSpec(spec);
-        return Task.CompletedTask;
     }
 
     public Task RestoreBackupAsync(string path)
