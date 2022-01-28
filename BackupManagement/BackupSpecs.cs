@@ -48,6 +48,16 @@ public class BackupSpecs
         return _specsByUniqueId![uniqueId];
     }
 
+    public void ReplaceSpec(BackupSpec spec)
+    {
+        InitIfNeeded();
+        var uniqueId = spec.GenerateUniqueID();
+        if(!_specsByUniqueId!.ContainsKey(uniqueId))
+            throw new ArgumentException($"Spec with uniqueId {spec.GenerateUniqueID()} does not exist");
+        _specsByUniqueId![uniqueId] = spec;
+        _backupRepository.SaveSpec(spec);
+
+    }
     public void AddSpec(BackupSpec spec)
     {
         InitIfNeeded();

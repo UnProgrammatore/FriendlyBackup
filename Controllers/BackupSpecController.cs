@@ -99,4 +99,26 @@ public class BackupSpecController : ControllerBase
         else
             return Accepted();
     }
+
+    [HttpPost("{uniqueId}/fix")]
+    public ActionResult<string> PostFix([FromRoute] string uniqueId)
+    {
+        if(!_backupSpecs.SpecExists(uniqueId))
+            return NotFound();
+        var spec = _backupSpecs.GetSpec(uniqueId);
+        var id = _longRunningRequestsRunner.RunLongRunningTask(cancellationToken => _backupConnector.FixBackupAsync(spec));
+        return Ok(id);
+    }
+
+    [HttpGet("fix/{taskId}")]
+    public ActionResult<bool> GetFix([FromRoute] string taskId)
+    {
+        if(!_longRunningRequestsRunner.ExistsTask(taskId))
+            return NotFound();
+        var (executed, _) = _longRunningRequestsRunner.GetTaskResult(taskId);
+        if(executed)
+            return Ok();
+        else
+            return Accepted();
+    }
 }

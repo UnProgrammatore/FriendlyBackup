@@ -27,6 +27,7 @@ public class BackupSpec {
             foreach(var newFile in CalculateBackup(folder)) 
                 yield return newFile;
     }
+
     public ReadyBackupDetails GetDiffBackup() {
         var newBackedUpFiles = new Dictionary<string, BackedUpFile>();
         var notFoundFiles = new HashSet<string>(_backedUpElements.Keys);
