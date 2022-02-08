@@ -2,6 +2,7 @@ using FriendlyBackup.BackgroundWorkers;
 using FriendlyBackup.BackupManagement;
 using FriendlyBackup.BackupManagement.Testing;
 using FriendlyBackup.Configuration;
+using FriendlyBackup.Encryption;
 using FriendlyBackup.Repositories;
 using FriendlyBackup.Repositories.Implementation;
 using NLog;
@@ -17,7 +18,9 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IBackupRepository, FileBackupRepository>();
 builder.Services.AddSingleton<IBackupConnector, FakeBackupConnector>();
+builder.Services.AddSingleton<IKeysRepository, FileKeysRepository>();
 builder.Services.AddSingleton<BackupSpecs>();
+builder.Services.AddSingleton<FileEncryptor>();
 
 var configBuilder = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
